@@ -12,6 +12,7 @@ Variable Dictionary:
     RPSu: the users choice
     RPSc: the computers choice
     outcome: starts off as a string but holds the outcome of the game
+    max: holds the max number for points
     timer: holds the 3,2,1 go
     timers: holds the setInterval property
     uScore: holds the users wins
@@ -20,34 +21,44 @@ Variable Dictionary:
 
 Program:
     This react app is made from hooks and is a Rock, Paper, Scissors game.
+    You choose how many points you want the max to be.
     It shows three options(Rock, Paper or Scissors) and when you click one it has a 3 second count down.
     During that 3 second countdown, it says 'Rock, Paper, Scissors, Shoot!'
     It then shows the computers choice and the outcome.
     If you win, you get a point
     If the computer wins, the computer gets a point.
-    The first to 3 points wins the whole game and it says whether you won or lost at the end.
+    The first to the max points wins the whole game and it says whether you won or lost at the end.
 */
 
 function App() {
     const RPS = ["Rock", "Paper", "Scissors"];
     const outcomes = ["It's a tie", "The computer wins", "You win!"];
+    const amount = [3, 5, 7, 9, 11, 13]
     const [RPSu, setRPSu] = useState(null);
     const [RPSc, setRPSc] = useState(null);
     const [outcome, setOutcome] = useState('Choose Rock, Paper or Scissors');
+    const [max, setMax] = useState(null)
     const [timer, setTimer] = useState(null)
     const [timers, setTimers] = useState(null)
     const [uScore, setUScore] = useState(0)
     const [cScore, setCScore] = useState(0)
-    const [win, setWin] = useState('Shoot!')
+    const [win, setWin] = useState(null)
 
     useEffect(() => {
         document.getElementById('gameOver').style.display = 'none';
+        document.getElementById('starting').style.display = 'block';
+        document.getElementById('container').style.display = 'none';
+        document.getElementById('winner').style.display = 'none';
     }, [])
 
-    function startGame() {
+    function startGame(change) {
         document.getElementById('gameOver').style.display = 'none';
         document.getElementById('container').style.display = 'block';
         document.getElementById('winner').style.display = 'block';
+        document.getElementById('starting').style.display = 'none';
+        setMax(change - 1);
+        setTimer(`First to ${change}`);
+        reset();
     }
 
     function handleClick(playerChoice) {
@@ -58,13 +69,13 @@ function App() {
         setOutcome(outcomes[oi])
         if (oi === 2) {
             // if user won
-            if (uScore === 2) {
+            if (uScore === max) {
                 // if user gets to 3 first, say that the user won
                 document.getElementById('gameOver').style.display = 'block';
                 document.getElementById('container').style.display = 'none';
                 document.getElementById('winner').style.display = 'none';
-                setUScore(0)
-                setCScore(0)
+                // adds one here so that the end screen shows the correct output
+                setUScore(uScore + 1)
                 setWin('won')
             } else {
                 // unless the user won, keep giving them points
@@ -73,16 +84,16 @@ function App() {
         } else if (oi === 1) {
             // if computer won
 
-            if (cScore === 2) {
-                // say you lost
+            if (cScore === max) {
                 document.getElementById('gameOver').style.display = 'block';
                 document.getElementById('container').style.display = 'none';
                 document.getElementById('winner').style.display = 'none';
-                setUScore(0)
-                setCScore(0)
+                // adds one here so that the end screen shows the correct output
+                setCScore(cScore + 1)
+                // say you lost
                 setWin('lost')
             } else {
-                //unless the computer won, keep givint it points
+                //unless the computer won, keep giving it points
                 setCScore(cScore + 1)
             }
         }
@@ -121,23 +132,36 @@ function App() {
         }
     }
 
+    function playAgain() {
+        // whenever you want to play again, it goes back to the screen where you choose the max
+        document.getElementById('gameOver').style.display = 'none';
+        document.getElementById('container').style.display = 'none';
+        document.getElementById('winner').style.display = 'none';
+        document.getElementById('starting').style.display = 'block';
+    }
+
     function reset() {
         // resets all the variables
         clearInterval(timers)
         setUScore(0)
         setCScore(0)
         setOutcome('Choose Rock, Paper or Scissors')
-        setTimer(null)
         setRPSu(null)
         setRPSc(null)
     }
 
     return (
-        <div>
+        <>
+            <div id='starting'>
+                <h3 style={{ backgroundColor: 'transparent' }}>First to..?</h3>
+                {amount.map((change) => (
+                    <button id='num' key={change} onClick={() => startGame(change)}>{change}</button>
+                ))}
+            </div>
             <div id='gameOver'>
                 <h1 style={{ backgroundColor: 'transparent' }}> Game Over </h1>
-                <h3 style={{ backgroundColor: 'transparent' }}>You {win}!</h3>
-                <div id="play-again" onClick={() => startGame()}>Play Again</div>
+                <h3 style={{ backgroundColor: 'transparent' }}>You {win} {uScore} to {cScore}!</h3>
+                <div id="play-again" onClick={() => playAgain()}>Play Again</div>
             </div>
             <div id='winner'>
                 <div id="user">User: {uScore}</div>
@@ -153,9 +177,9 @@ function App() {
                 <h1 id="cOutput">The computer selected: {RPSc}</h1>
                 <h1 id='outcome'>{outcome}</h1>
                 <h1 id='time'>{timer}</h1>
-                <div id="reset" onClick={() => reset()}>Reset</div>
+                <div id="reset" onClick={() => playAgain()}>Reset</div>
             </div>
-        </div>
+        </>
     );
 }
 
