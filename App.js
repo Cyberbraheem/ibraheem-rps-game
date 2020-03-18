@@ -45,9 +45,10 @@ function App() {
         setRPSc(RPS[computerChoice]);
         setOutcome(outcomes[oi])
         if (oi === 2) {
-            // or if you won
+            // if you won
             setScore(score + 3)
         }  else if(oi === 1)  {
+            //if the computer won
             if (score > 0) {
                 //if there is score to take away from, do it
                 setScore(score - 1)
@@ -77,6 +78,7 @@ function App() {
         }, 400))
     }
     function checkTimer(time) {
+        // shows go and then shows outcome
         if (time <= 0) {
             setTimer('Go!')
         }
