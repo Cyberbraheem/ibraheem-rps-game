@@ -21,6 +21,7 @@ Variable Dictionary:
 Program:
     This react app is made from hooks and is a Rock, Paper, Scissors game.
     It shows three options(Rock, Paper or Scissors) and when you click one it has a 3 second count down.
+    During that 3 second countdown, it says 'Rock, Paper, Scissors, Shoot!'
     It then shows the computers choice and the outcome.
     If you win, you get a point
     If the computer wins, the computer gets a point.
@@ -57,7 +58,7 @@ function App() {
         setOutcome(outcomes[oi])
         if (oi === 2) {
             // if user won
-            if (uScore === 3) {
+            if (uScore === 2) {
                 // if user gets to 3 first, say that the user won
                 document.getElementById('gameOver').style.display = 'block';
                 document.getElementById('container').style.display = 'none';
@@ -72,7 +73,7 @@ function App() {
         } else if (oi === 1) {
             // if computer won
 
-            if (cScore === 3) {
+            if (cScore === 2) {
                 // say you lost
                 document.getElementById('gameOver').style.display = 'block';
                 document.getElementById('container').style.display = 'none';
@@ -93,8 +94,8 @@ function App() {
         clearInterval(timers)
         setRPSu(RPS[i]);
         let time = 3;
-        // sets timer to time here since it would usually output 2 instead of 3 because of the way it renders
-        setTimer(time)
+        // sets timer to rock so that it starts off with showing 'Rock' and then proceeds to checkTimer
+        setTimer('Rock')
         setTimers(setInterval(() => {
             time--;
             setTimer(time);
@@ -104,14 +105,19 @@ function App() {
                 handleClick(i)
                 clearInterval(timers)
             }
-            // passes time to checkTimer so that it can end the timer when tiem === 0
+            // passes time to checkTimer so that it can end the timer when time === 0
             checkTimer(time);
         }, 400))
     }
 
     function checkTimer(time) {
-        if (time <= 0) {
-            setTimer('Go!')
+        // this code counts down and instead of showing 3,2,1 it shows RPS shoot
+        if (time === 2) {
+            setTimer('Paper')
+        } else if (time === 1) {
+            setTimer('Scissors')
+        } else if (time <= 0) {
+            setTimer('Shoot!')
         }
     }
 
@@ -131,7 +137,6 @@ function App() {
             <div id='gameOver'>
                 <h1 style={{ backgroundColor: 'transparent' }}> Game Over </h1>
                 <h3 style={{ backgroundColor: 'transparent' }}>You {win}!</h3>
-                {/* <h3 style={{ backgroundColor: 'transparent' }}>You {best} a highscore</h3> */}
                 <div id="play-again" onClick={() => startGame()}>Play Again</div>
             </div>
             <div id='winner'>
