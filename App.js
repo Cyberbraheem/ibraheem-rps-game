@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 
 /*
 Name: Ibraheem Dawod
 Age: 13 years old
-Date Finished: Sunday, March 16, 2020
+Date Finished: Sunday, March 18, 2020
 
 
 Variable Dictionary:
@@ -15,16 +14,17 @@ Variable Dictionary:
     outcome: starts off as a string but holds the outcome of the game
     timer: holds the 3,2,1 go
     timers: holds the setInterval property
-    score: holds the score
+    uScore: holds the users wins
+    cScore: holds the computers wins
+    win: holds whether you won or lost
 
 Program:
-    This react app is made from hooks and is s Rock, Paper, Scissors game.
+    This react app is made from hooks and is a Rock, Paper, Scissors game.
     It shows three options(Rock, Paper or Scissors) and when you click one it has a 3 second count down.
     It then shows the computers choice and the outcome.
-    If you win, you get 3 points.
-    If you lose, you lose 3 points.
-    If you tie, you gain 1 point.
-    There is a reset button which resets the game back to the starting position.
+    If you win, you get a point
+    If the computer wins, the computer gets a point.
+    The first to 3 points wins the whole game and it says whether you won or lost at the end.
 */
 
 function App() {
@@ -35,8 +35,19 @@ function App() {
     const [outcome, setOutcome] = useState('Choose Rock, Paper or Scissors');
     const [timer, setTimer] = useState(null)
     const [timers, setTimers] = useState(null)
-    const [score, setScore] = useState(0)
+    const [uScore, setUScore] = useState(0)
+    const [cScore, setCScore] = useState(0)
+    const [win, setWin] = useState('Shoot!')
 
+    useEffect(() => {
+        document.getElementById('gameOver').style.display = 'none';
+    }, [])
+
+    function startGame() {
+        document.getElementById('gameOver').style.display = 'none';
+        document.getElementById('container').style.display = 'block';
+        document.getElementById('winner').style.display = 'block';
+    }
 
     function handleClick(playerChoice) {
         let computerChoice = Math.floor(Math.random() * RPS.length);
@@ -45,49 +56,70 @@ function App() {
         setRPSc(RPS[computerChoice]);
         setOutcome(outcomes[oi])
         if (oi === 2) {
-            // if you won
-            setScore(score + 3)
-        }  else if(oi === 1)  {
-            //if the computer won
-            if (score > 0) {
-                //if there is score to take away from, do it
-                setScore(score - 1)
+            // if user won
+            if (uScore === 3) {
+                // if user gets to 3 first, say that the user won
+                document.getElementById('gameOver').style.display = 'block';
+                document.getElementById('container').style.display = 'none';
+                document.getElementById('winner').style.display = 'none';
+                setUScore(0)
+                setCScore(0)
+                setWin('won')
+            } else {
+                // unless the user won, keep giving them points
+                setUScore(uScore + 1)
+            }
+        } else if (oi === 1) {
+            // if computer won
+
+            if (cScore === 3) {
+                // say you lost
+                document.getElementById('gameOver').style.display = 'block';
+                document.getElementById('container').style.display = 'none';
+                document.getElementById('winner').style.display = 'none';
+                setUScore(0)
+                setCScore(0)
+                setWin('lost')
+            } else {
+                //unless the computer won, keep givint it points
+                setCScore(cScore + 1)
             }
         }
     }
 
-    // timer is called whenever a choice is chosen
     function Timer(i) {
-        // first 3 lines are just clearing the old values
+        // sets the users value equal to what he clocked while clearing old variables
         setRPSc(null)
         clearInterval(timers)
         setRPSu(RPS[i]);
-        // starts a timer and minuses one every time
         let time = 3;
+        // sets timer to time here since it would usually output 2 instead of 3 because of the way it renders
         setTimer(time)
         setTimers(setInterval(() => {
             time--;
             setTimer(time);
-            // the reason it's -1 and not 0 is because I wanted it to show 'Go!' before the answer
+            console.log(time)
             if (time === -1) {
+                // it says minus one here because at 0 I wanted for it to say 'Go!' and then it shows the outcome
                 handleClick(i)
                 clearInterval(timers)
             }
-            // passes time to checkTimer so that it can end the timer when time === 0
+            // passes time to checkTimer so that it can end the timer when tiem === 0
             checkTimer(time);
         }, 400))
     }
+
     function checkTimer(time) {
-        // shows go and then shows outcome
         if (time <= 0) {
             setTimer('Go!')
         }
     }
-    
-    //resets everything to the same as the intial render
+
     function reset() {
+        // resets all the variables
         clearInterval(timers)
-        setScore(0)
+        setUScore(0)
+        setCScore(0)
         setOutcome('Choose Rock, Paper or Scissors')
         setTimer(null)
         setRPSu(null)
@@ -95,22 +127,31 @@ function App() {
     }
 
     return (
-        <div id="container">
-            //mapping the RPS so as to not repeat
-            {RPS.map((choice, i) => (
-                <button id='choice' key={i} onClick={() => Timer(i)}>
-                    {choice}
-                </button>
-            ))}
-            <h2 id="uOutput">You selected: {RPSu}</h2>
-            <h1 id="cOutput">The computer selected: {RPSc}</h1>
-            <h1 id='outcome'>{outcome}</h1>
-            <h1 id='time'>{timer}</h1>
-            <div id="reset" onClick={() => reset()}>Reset</div>
-            <div id="score">{score}</div>
+        <div>
+            <div id='gameOver'>
+                <h1 style={{ backgroundColor: 'transparent' }}> Game Over </h1>
+                <h3 style={{ backgroundColor: 'transparent' }}>You {win}!</h3>
+                {/* <h3 style={{ backgroundColor: 'transparent' }}>You {best} a highscore</h3> */}
+                <div id="play-again" onClick={() => startGame()}>Play Again</div>
+            </div>
+            <div id='winner'>
+                <div id="user">User: {uScore}</div>
+                <div id="computer">Computer: {cScore}</div>
+            </div>
+            <div id="container">
+                {RPS.map((choice, i) => (
+                    <button id='choice' key={i} onClick={() => Timer(i)}>
+                        {choice}
+                    </button>
+                ))}
+                <h2 id="uOutput">You selected: {RPSu}</h2>
+                <h1 id="cOutput">The computer selected: {RPSc}</h1>
+                <h1 id='outcome'>{outcome}</h1>
+                <h1 id='time'>{timer}</h1>
+                <div id="reset" onClick={() => reset()}>Reset</div>
+            </div>
         </div>
     );
 }
 
 export default App;
-
