@@ -1,0 +1,2 @@
+# ibraheem-rps-game
+Program:     This react app is made from hooks and is s Rock, Paper, Scissors game.     It shows three options(Rock, Paper or Scissors) and when you click one it has a 3 second count down.     It then shows the computers choice and the outcome.     If you win, you get 3 points.     If you lose, you lose 3 points.     If you tie, you gain 1 point.     There is a reset button which resets the game back to the starting position.
